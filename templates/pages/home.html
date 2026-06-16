@@ -1,0 +1,22 @@
+<!doctype html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mi primera pagina Django</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <main>
+        <section>
+            <h1>Hola, Django esta funcionando</h1>
+            <p>Esta es tu primera pagina web servida desde un contenedor Docker jaja .</p>
+            <p>La vista vive en <code>pages/views.py</code> y esta plantilla vive en <code>templates/pages/home.html</code>.</p>
+            <button type="button" data-saludo>Probar JavaScript</button>
+            <p class="mensaje" data-mensaje></p>
+        </section>
+    </main>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
