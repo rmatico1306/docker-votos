@@ -1,0 +1,32 @@
+services:
+  web:
+    build: .
+    container_name: votos-web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DB_NAME: votos_db
+      DB_USER: votos_user
+      DB_PASSWORD: votos_password
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+    container_name: votos-db
+    environment:
+      POSTGRES_DB: votos_db
+      POSTGRES_USER: votos_user
+      POSTGRES_PASSWORD: votos_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
