@@ -26,12 +26,15 @@ function App() {
   const [resumen, setResumen] = useState({
     total_votos: 0,
     casillas_capturadas: 0,
+    casillas_registradas: 0,
+    avance_captura: 0,
     partidos: [],
   });
   const [casillaSeleccionada, setCasillaSeleccionada] = useState(null);
   const [votos, setVotos] = useState({});
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(true);
+  const [ultimaActualizacion, setUltimaActualizacion] = useState(new Date());
 
   useEffect(() => {
     cargarDatosIniciales();
@@ -42,7 +45,7 @@ function App() {
       actualizarResumen().catch((error) => {
         setMensaje(error.message);
       });
-    }, 60000);
+    }, 5000);
 
     return () => window.clearInterval(intervalId);
   }, []);
@@ -68,6 +71,7 @@ function App() {
   async function actualizarResumen() {
     const resumenData = await getResumen();
     setResumen(resumenData);
+    setUltimaActualizacion(new Date());
   }
 
   async function seleccionarCasilla(casilla) {
@@ -157,6 +161,18 @@ function App() {
     },
   };
 
+  const casillasRegistradas = resumen.casillas_registradas || casillas.length;
+  const porcentajeCasillas = Math.min(100, resumen.avance_captura || 0);
+
+  const totalFormateado = new Intl.NumberFormat("es-MX").format(
+    resumen.total_votos,
+  );
+
+  const fechaCorte = new Intl.DateTimeFormat("es-MX", {
+    dateStyle: "medium",
+    timeStyle: "medium",
+  }).format(ultimaActualizacion);
+
   if (cargando) {
     return (
       <main className="container py-4">
@@ -166,68 +182,143 @@ function App() {
   }
 
   return (
-    <main className="container py-4">
-      <div className="mb-4">
-        <h1 className="h3 mb-1">Sistema Municipal de Votos</h1>
-        <p className="text-muted mb-0">
-          Captura interna de resultados por municipio, seccion y casilla.
-        </p>
-      </div>
+    <main className="prep-page">
+      <header className="prep-topbar">
+        <div className="prep-brand">
+          <div className="prep-logo">SM</div>
+          <div>
+            <p className="prep-kicker">Sistema interno municipal</p>
+            <h1 className="prep-title">Captura y Control de Votos</h1>
+          </div>
+        </div>
+        <div className="prep-status">
+          <span className="status-dot"></span>
+          Actualizacion automatica
+        </div>
+      </header>
 
       {mensaje && <div className="alert alert-info">{mensaje}</div>}
 
-      <section className="row g-3 mb-4">
-        <div className="col-md-4">
-          <div className="card h-100">
-            <div className="card-body">
-              <div className="text-muted small">Votos capturados</div>
-              <div className="display-6">{resumen.total_votos}</div>
-            </div>
-          </div>
+      <section className="prep-hero">
+        <div>
+          <p className="section-label">Resultados preliminares</p>
+          <h2>Programa de captura por municipio, seccion y casilla</h2>
+          <p className="text-muted mb-0">
+            Informacion operativa para seguimiento interno. No representa voto
+            ciudadano en linea.
+          </p>
         </div>
-        <div className="col-md-4">
-          <div className="card h-100">
-            <div className="card-body">
-              <div className="text-muted small">Casillas capturadas</div>
-              <div className="display-6">{resumen.casillas_capturadas}</div>
-            </div>
-          </div>
+        <div className="cutoff-panel">
+          <span>Ultimo corte</span>
+          <strong>{fechaCorte}</strong>
+          <small>Refresco cada 5 segundos</small>
         </div>
-        <div className="col-md-4">
-          <div className="card h-100">
-            <div className="card-body">
-              <div className="text-muted small">Casillas registradas</div>
-              <div className="display-6">{casillas.length}</div>
-            </div>
+      </section>
+
+      <section className="metrics-grid">
+        <div className="metric-card">
+          <span>Votos capturados</span>
+          <strong>{totalFormateado}</strong>
+        </div>
+        <div className="metric-card">
+          <span>Casillas capturadas</span>
+          <strong>{resumen.casillas_capturadas}</strong>
+        </div>
+        <div className="metric-card">
+          <span>Casillas registradas</span>
+          <strong>{casillasRegistradas}</strong>
+        </div>
+        <div className="metric-card">
+          <span>Avance de captura</span>
+          <strong>{porcentajeCasillas}%</strong>
+          <div className="progress prep-progress" aria-hidden="true">
+            <div
+              className="progress-bar"
+              style={{ width: `${porcentajeCasillas}%` }}
+            ></div>
           </div>
         </div>
       </section>
 
-      <section className="card mb-4">
-        <div className="card-header">Resumen por partido</div>
-        <div className="card-body">
+      <section className="prep-dashboard">
+        <div className="panel chart-panel">
+          <div className="panel-header">
+            <div>
+              <p className="section-label">Grafica</p>
+              <h2>Votos por partido</h2>
+            </div>
+          </div>
           {resumen.partidos.length === 0 ? (
-            <p className="text-muted mb-0">
-              Aun no hay resultados capturados.
-            </p>
+            <p className="text-muted mb-0">Aun no hay resultados capturados.</p>
           ) : (
-            <div style={{ height: "320px" }}>
+            <div className="dashboard-chart">
               <Bar data={chartData} options={chartOptions} />
             </div>
           )}
         </div>
+
+        <div className="panel results-panel">
+          <div className="panel-header">
+            <div>
+              <p className="section-label">Tabla</p>
+              <h2>Resumen por partido</h2>
+            </div>
+          </div>
+          <div className="table-responsive">
+            <table className="table prep-table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Partido</th>
+                  <th className="text-end">Votos</th>
+                  <th className="text-end">Porcentaje</th>
+                </tr>
+              </thead>
+              <tbody>
+                {resumen.partidos.map((partido) => {
+                  const porcentaje =
+                    resumen.total_votos === 0
+                      ? 0
+                      : (partido.total_votos / resumen.total_votos) * 100;
+
+                  return (
+                    <tr key={partido.partido_id}>
+                      <td>
+                        <span
+                          className="party-swatch"
+                          style={{ backgroundColor: partido.color }}
+                        ></span>
+                        <strong>{partido.siglas}</strong>
+                        <span className="party-name">{partido.nombre}</span>
+                      </td>
+                      <td className="text-end">
+                        {new Intl.NumberFormat("es-MX").format(
+                          partido.total_votos,
+                        )}
+                      </td>
+                      <td className="text-end">{porcentaje.toFixed(2)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
-      <div className="row g-4">
-        <section className="col-lg-5">
-          <div className="card">
-            <div className="card-header">Casillas</div>
-            <div className="list-group list-group-flush">
+      <div className="capture-grid">
+        <section className="panel">
+          <div className="panel-header">
+            <div>
+              <p className="section-label">Seleccion</p>
+              <h2>Casillas</h2>
+            </div>
+          </div>
+            <div className="casilla-list list-group list-group-flush">
               {casillas.map((casilla) => (
                 <button
                   key={casilla.id}
                   type="button"
-                  className={`list-group-item list-group-item-action ${
+                  className={`casilla-button list-group-item list-group-item-action ${
                     casillaSeleccionada?.id === casilla.id ? "active" : ""
                   }`}
                   onClick={() => seleccionarCasilla(casilla)}
@@ -245,21 +336,24 @@ function App() {
                 </div>
               )}
             </div>
-          </div>
         </section>
 
-        <section className="col-lg-7">
-          <div className="card">
-            <div className="card-header">Captura de resultados</div>
+        <section className="panel">
+          <div className="panel-header">
+            <div>
+              <p className="section-label">Captura</p>
+              <h2>Resultados de casilla</h2>
+            </div>
+          </div>
 
             {!casillaSeleccionada ? (
-              <div className="card-body text-muted">
+              <div className="empty-state text-muted">
                 Selecciona una casilla para capturar votos.
               </div>
             ) : (
               <form onSubmit={guardarVotos}>
-                <div className="card-body">
-                  <h2 className="h5">
+                <div className="capture-body">
+                  <h2 className="capture-title h5">
                     Seccion {casillaSeleccionada.seccion.numero} /{" "}
                     {casillaSeleccionada.tipo_nombre}{" "}
                     {casillaSeleccionada.numero}
@@ -268,7 +362,7 @@ function App() {
                   <div className="row g-3 mt-2">
                     {partidos.map((partido) => (
                       <div className="col-md-6" key={partido.id}>
-                        <label className="form-label">
+                        <label className="party-label form-label">
                           {partido.siglas} - {partido.nombre}
                         </label>
                         <input
@@ -285,14 +379,13 @@ function App() {
                   </div>
                 </div>
 
-                <div className="card-footer text-end">
+                <div className="save-actions">
                   <button type="submit" className="btn btn-primary">
                     Guardar resultados
                   </button>
                 </div>
               </form>
             )}
-          </div>
         </section>
       </div>
     </main>

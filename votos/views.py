@@ -43,11 +43,22 @@ def api_resumen(request):
     casillas_capturadas = (
         ResultadoCasilla.objects.values("casilla_id").distinct().count()
     )
+    casillas_registradas = Casilla.objects.count()
+    avance_captura = (
+        0
+        if casillas_registradas == 0
+        else min(
+            100,
+            round((casillas_capturadas / casillas_registradas) * 100),
+        )
+    )
 
     return Response(
         {
             "total_votos": total_votos,
             "casillas_capturadas": casillas_capturadas,
+            "casillas_registradas": casillas_registradas,
+            "avance_captura": avance_captura,
             "partidos": partidos,
         }
     )
