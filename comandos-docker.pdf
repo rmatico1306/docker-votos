@@ -3,19 +3,22 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+<< /Type /Pages /Kids [5 0 R 6 0 R] /Count 2 >>
 endobj
 3 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
-endobj
-4 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
-5 0 obj
+4 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier >>
 endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
 6 0 obj
-<< /Length 2989 >>
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+7 0 obj
+<< /Length 2670 >>
 stream
 BT
 /F1 20 Tf
@@ -135,36 +138,97 @@ BT
 /F2 10 Tf
 72 82 Td (docker rmi NOMBRE_IMAGEN) Tj
 -72 -82 Td
+ET
+
+endstream
+endobj
+8 0 obj
+<< /Length 1449 >>
+stream
+BT
 /F1 10 Tf
-72 66 Td (Elimina una imagen.) Tj
--72 -66 Td
+72 760 Td (Elimina una imagen.) Tj
+-72 -760 Td
 /F1 14 Tf
-54 40 Td (Direcciones utiles) Tj
--54 -40 Td
+54 734 Td (Direcciones utiles) Tj
+-54 -734 Td
 /F2 10 Tf
-72 18 Td (React/Vite: http://localhost:5173) Tj
--72 -18 Td
+72 712 Td (React/Vite: http://localhost:5173) Tj
+-72 -712 Td
 /F2 10 Tf
-72 2 Td (Django: http://localhost:8000) Tj
--72 -2 Td
+72 696 Td (Django: http://localhost:8000) Tj
+-72 -696 Td
 /F2 10 Tf
-72 -14 Td (Admin Django: http://localhost:8000/admin/) Tj
--72 14 Td
+72 680 Td (Admin Django: http://localhost:8000/admin/) Tj
+-72 -680 Td
+/F1 14 Tf
+54 654 Td (Actualizar repositorio con Git) Tj
+-54 -654 Td
+/F2 10 Tf
+72 632 Td (git status) Tj
+-72 -632 Td
+/F1 10 Tf
+72 616 Td (Muestra el estado del repo, cambios pendientes y commits sin subir.) Tj
+-72 -616 Td
+/F2 10 Tf
+72 600 Td (git pull origin main) Tj
+-72 -600 Td
+/F1 10 Tf
+72 584 Td (Descarga y aplica los cambios de la rama main en GitHub.) Tj
+-72 -584 Td
+/F2 10 Tf
+72 568 Td (git push origin main) Tj
+-72 -568 Td
+/F1 10 Tf
+72 552 Td (Sube tus commits locales a GitHub.) Tj
+-72 -552 Td
+/F2 10 Tf
+72 536 Td (git fetch) Tj
+-72 -536 Td
+/F1 10 Tf
+72 520 Td (Trae informacion del remoto sin mezclar cambios todavia.) Tj
+-72 -520 Td
+/F2 10 Tf
+72 504 Td (git branch -r) Tj
+-72 -504 Td
+/F1 10 Tf
+72 488 Td (Lista las ramas remotas disponibles.) Tj
+-72 -488 Td
+/F1 14 Tf
+54 462 Td (Flujo recomendado) Tj
+-54 -462 Td
+/F2 10 Tf
+72 440 Td (git status) Tj
+-72 -440 Td
+/F2 10 Tf
+72 424 Td (git add .) Tj
+-72 -424 Td
+/F2 10 Tf
+72 408 Td (git commit -m "guardar cambios locales") Tj
+-72 -408 Td
+/F2 10 Tf
+72 392 Td (git pull origin main) Tj
+-72 -392 Td
+/F2 10 Tf
+72 376 Td (git push origin main) Tj
+-72 -376 Td
 ET
 
 endstream
 endobj
 xref
-0 7
+0 9
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000115 00000 n 
-0000000251 00000 n 
-0000000321 00000 n 
-0000000389 00000 n 
+0000000121 00000 n 
+0000000191 00000 n 
+0000000259 00000 n 
+0000000395 00000 n 
+0000000531 00000 n 
+0000003253 00000 n 
 trailer
-<< /Size 7 /Root 1 0 R >>
+<< /Size 9 /Root 1 0 R >>
 startxref
-3430
+4754
 %%EOF

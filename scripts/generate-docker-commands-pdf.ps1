@@ -54,9 +54,29 @@ $Lines = @(
     @{ Text = "Direcciones utiles"; Size = 14; Font = "F1" },
     @{ Text = "React/Vite: http://localhost:5173"; Size = 10; Font = "F2" },
     @{ Text = "Django: http://localhost:8000"; Size = 10; Font = "F2" },
-    @{ Text = "Admin Django: http://localhost:8000/admin/"; Size = 10; Font = "F2" }
+    @{ Text = "Admin Django: http://localhost:8000/admin/"; Size = 10; Font = "F2" },
+    @{ Text = ""; Size = 10; Font = "F1" },
+    @{ Text = "Actualizar repositorio con Git"; Size = 14; Font = "F1" },
+    @{ Text = "git status"; Size = 10; Font = "F2" },
+    @{ Text = "Muestra el estado del repo, cambios pendientes y commits sin subir."; Size = 10; Font = "F1" },
+    @{ Text = "git pull origin main"; Size = 10; Font = "F2" },
+    @{ Text = "Descarga y aplica los cambios de la rama main en GitHub."; Size = 10; Font = "F1" },
+    @{ Text = "git push origin main"; Size = 10; Font = "F2" },
+    @{ Text = "Sube tus commits locales a GitHub."; Size = 10; Font = "F1" },
+    @{ Text = "git fetch"; Size = 10; Font = "F2" },
+    @{ Text = "Trae informacion del remoto sin mezclar cambios todavia."; Size = 10; Font = "F1" },
+    @{ Text = "git branch -r"; Size = 10; Font = "F2" },
+    @{ Text = "Lista las ramas remotas disponibles."; Size = 10; Font = "F1" },
+    @{ Text = ""; Size = 10; Font = "F1" },
+    @{ Text = "Flujo recomendado"; Size = 14; Font = "F1" },
+    @{ Text = "git status"; Size = 10; Font = "F2" },
+    @{ Text = "git add ."; Size = 10; Font = "F2" },
+    @{ Text = "git commit -m `"guardar cambios locales`""; Size = 10; Font = "F2" },
+    @{ Text = "git pull origin main"; Size = 10; Font = "F2" },
+    @{ Text = "git push origin main"; Size = 10; Font = "F2" }
 )
 
+$Pages = New-Object System.Collections.Generic.List[string]
 $Y = 760
 $Content = "BT`n"
 foreach ($Line in $Lines) {
@@ -67,6 +87,14 @@ foreach ($Line in $Lines) {
 
     $X = if ($Line.Size -ge 14) { 54 } else { 72 }
     $Leading = if ($Line.Size -ge 14) { 22 } else { 16 }
+
+    if (($Y - $Leading) -lt 54) {
+        $Content += "ET`n"
+        $Pages.Add($Content)
+        $Y = 760
+        $Content = "BT`n"
+    }
+
     $Text = Escape-PdfText $Line.Text
     $Content += "/$($Line.Font) $($Line.Size) Tf`n"
     $Content += "$X $Y Td ($Text) Tj`n"
@@ -74,15 +102,31 @@ foreach ($Line in $Lines) {
     $Y -= $Leading
 }
 $Content += "ET`n"
+$Pages.Add($Content)
 
-$Objects = @(
-    "<< /Type /Catalog /Pages 2 0 R >>",
-    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>",
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>",
-    "<< /Length $([Text.Encoding]::ASCII.GetByteCount($Content)) >>`nstream`n$Content`nendstream"
-)
+$Objects = New-Object System.Collections.Generic.List[string]
+$Objects.Add("<< /Type /Catalog /Pages 2 0 R >>")
+
+$PageObjectStart = 5
+$ContentObjectStart = $PageObjectStart + $Pages.Count
+$Kids = New-Object System.Collections.Generic.List[string]
+for ($Index = 0; $Index -lt $Pages.Count; $Index++) {
+    $Kids.Add("$($PageObjectStart + $Index) 0 R")
+}
+
+$Objects.Add("<< /Type /Pages /Kids [$($Kids -join ' ')] /Count $($Pages.Count) >>")
+$Objects.Add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
+$Objects.Add("<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>")
+
+for ($Index = 0; $Index -lt $Pages.Count; $Index++) {
+    $ContentObjectId = $ContentObjectStart + $Index
+    $Objects.Add("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents $ContentObjectId 0 R >>")
+}
+
+for ($Index = 0; $Index -lt $Pages.Count; $Index++) {
+    $PageContent = $Pages[$Index]
+    $Objects.Add("<< /Length $([Text.Encoding]::ASCII.GetByteCount($PageContent)) >>`nstream`n$PageContent`nendstream")
+}
 
 $Pdf = "%PDF-1.4`n"
 $Offsets = New-Object System.Collections.Generic.List[int]
