@@ -1,4 +1,17 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: votos-frontend
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - web
+
   web:
     build: .
     container_name: votos-web

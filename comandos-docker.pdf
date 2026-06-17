@@ -1,0 +1,170 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Length 2989 >>
+stream
+BT
+/F1 20 Tf
+54 760 Td (Comandos principales de Docker) Tj
+-54 -760 Td
+/F1 11 Tf
+72 738 Td (Guia rapida para este proyecto Django + React + PostgreSQL) Tj
+-72 -738 Td
+/F1 14 Tf
+54 712 Td (Levantar servicios) Tj
+-54 -712 Td
+/F2 10 Tf
+72 690 Td (docker compose up) Tj
+-72 -690 Td
+/F1 10 Tf
+72 674 Td (Inicia los servicios definidos en docker-compose.yml.) Tj
+-72 -674 Td
+/F2 10 Tf
+72 658 Td (docker compose up --build) Tj
+-72 -658 Td
+/F1 10 Tf
+72 642 Td (Reconstruye las imagenes y luego inicia los contenedores.) Tj
+-72 -642 Td
+/F2 10 Tf
+72 626 Td (docker compose up -d) Tj
+-72 -626 Td
+/F1 10 Tf
+72 610 Td (Inicia los servicios en segundo plano.) Tj
+-72 -610 Td
+/F1 14 Tf
+54 584 Td (Detener y revisar) Tj
+-54 -584 Td
+/F2 10 Tf
+72 562 Td (docker compose down) Tj
+-72 -562 Td
+/F1 10 Tf
+72 546 Td (Detiene y elimina los contenedores del proyecto.) Tj
+-72 -546 Td
+/F2 10 Tf
+72 530 Td (docker compose ps) Tj
+-72 -530 Td
+/F1 10 Tf
+72 514 Td (Muestra los contenedores y puertos activos.) Tj
+-72 -514 Td
+/F2 10 Tf
+72 498 Td (docker compose logs) Tj
+-72 -498 Td
+/F1 10 Tf
+72 482 Td (Muestra logs de todos los servicios.) Tj
+-72 -482 Td
+/F2 10 Tf
+72 466 Td (docker compose logs web) Tj
+-72 -466 Td
+/F1 10 Tf
+72 450 Td (Muestra logs del backend Django.) Tj
+-72 -450 Td
+/F2 10 Tf
+72 434 Td (docker compose logs frontend) Tj
+-72 -434 Td
+/F1 10 Tf
+72 418 Td (Muestra logs del frontend React/Vite.) Tj
+-72 -418 Td
+/F1 14 Tf
+54 392 Td (Entrar a contenedores y Django) Tj
+-54 -392 Td
+/F2 10 Tf
+72 370 Td (docker compose exec web sh) Tj
+-72 -370 Td
+/F1 10 Tf
+72 354 Td (Entra al contenedor de Django.) Tj
+-72 -354 Td
+/F2 10 Tf
+72 338 Td (docker compose exec web python manage.py migrate) Tj
+-72 -338 Td
+/F1 10 Tf
+72 322 Td (Ejecuta migraciones de Django.) Tj
+-72 -322 Td
+/F2 10 Tf
+72 306 Td (docker compose exec web python manage.py createsuperuser) Tj
+-72 -306 Td
+/F1 10 Tf
+72 290 Td (Crea el usuario administrador de Django.) Tj
+-72 -290 Td
+/F1 14 Tf
+54 264 Td (Comandos Docker generales) Tj
+-54 -264 Td
+/F2 10 Tf
+72 242 Td (docker ps) Tj
+-72 -242 Td
+/F1 10 Tf
+72 226 Td (Lista contenedores corriendo.) Tj
+-72 -226 Td
+/F2 10 Tf
+72 210 Td (docker ps -a) Tj
+-72 -210 Td
+/F1 10 Tf
+72 194 Td (Lista todos los contenedores, incluso detenidos.) Tj
+-72 -194 Td
+/F2 10 Tf
+72 178 Td (docker images) Tj
+-72 -178 Td
+/F1 10 Tf
+72 162 Td (Lista imagenes Docker.) Tj
+-72 -162 Td
+/F2 10 Tf
+72 146 Td (docker stop NOMBRE_CONTENEDOR) Tj
+-72 -146 Td
+/F1 10 Tf
+72 130 Td (Detiene un contenedor.) Tj
+-72 -130 Td
+/F2 10 Tf
+72 114 Td (docker rm NOMBRE_CONTENEDOR) Tj
+-72 -114 Td
+/F1 10 Tf
+72 98 Td (Elimina un contenedor detenido.) Tj
+-72 -98 Td
+/F2 10 Tf
+72 82 Td (docker rmi NOMBRE_IMAGEN) Tj
+-72 -82 Td
+/F1 10 Tf
+72 66 Td (Elimina una imagen.) Tj
+-72 -66 Td
+/F1 14 Tf
+54 40 Td (Direcciones utiles) Tj
+-54 -40 Td
+/F2 10 Tf
+72 18 Td (React/Vite: http://localhost:5173) Tj
+-72 -18 Td
+/F2 10 Tf
+72 2 Td (Django: http://localhost:8000) Tj
+-72 -2 Td
+/F2 10 Tf
+72 -14 Td (Admin Django: http://localhost:8000/admin/) Tj
+-72 14 Td
+ET
+
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000000321 00000 n 
+0000000389 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+3430
+%%EOF
