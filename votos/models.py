@@ -68,6 +68,11 @@ class Partido(models.Model):
     nombre = models.CharField(max_length=120, unique=True)
     siglas = models.CharField(max_length=20, unique=True)
     color = models.CharField(max_length=20, default="#6c757d")
+    imagen_url = models.URLField(
+        "URL de imagen",
+        blank=True,
+        help_text="Logo o imagen del partido para mostrar en el frontend.",
+    )
 
     class Meta:
         ordering = ["siglas"]

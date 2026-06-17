@@ -246,29 +246,24 @@
   vertical-align: middle;
 }
 
+.party-thumbnail {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid #d9dee6;
+  border-radius: 6px;
+  vertical-align: middle;
+}
+
 .party-name {
   display: block;
-  margin-left: 24px;
+  margin-left: 42px;
   max-width: min(220px, 52vw);
   overflow: hidden;
   font-size: 0.85rem;
   text-overflow: ellipsis;
-}
-
-.capture-grid {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
-  gap: 18px;
-  align-items: start;
-}
-
-.casilla-list {
-  max-height: 520px;
-  overflow-y: auto;
-}
-
-.casilla-button {
-  text-align: left;
 }
 
 .list-group-item.active {
@@ -276,31 +271,8 @@
   border-color: #2563eb;
 }
 
-.empty-state,
-.capture-body {
-  padding: 18px;
-}
-
-.capture-title {
-  line-height: 1.25;
-}
-
-.party-label {
-  min-height: 48px;
-  display: flex;
-  align-items: flex-end;
-}
-
-.save-actions {
-  padding: 14px 18px;
-  text-align: right;
-  background: #f8fafc;
-  border-top: 1px solid #d9dee6;
-}
-
 @media (max-width: 1180px) {
-  .prep-dashboard,
-  .capture-grid {
+  .prep-dashboard {
     grid-template-columns: 1fr;
   }
 
@@ -366,28 +338,9 @@
     padding: 12px;
   }
 
-  .panel-header,
-  .empty-state,
-  .capture-body,
-  .save-actions {
+  .panel-header {
     padding-left: 12px;
     padding-right: 12px;
-  }
-
-  .casilla-list {
-    max-height: 340px;
-  }
-
-  .party-label {
-    min-height: auto;
-  }
-
-  .save-actions {
-    display: grid;
-  }
-
-  .save-actions .btn {
-    width: 100%;
   }
 }
 

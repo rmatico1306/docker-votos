@@ -11,21 +11,15 @@ import {
 import { Bar } from "react-chartjs-2";
 
 import {
-  getCasillas,
-  getPartidos,
-  getResultadosCasilla,
   getResumen,
   isAuthenticated,
   login,
   logout,
-  guardarResultadosCasilla,
 } from "./api";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 function App() {
-  const [casillas, setCasillas] = useState([]);
-  const [partidos, setPartidos] = useState([]);
   const [resumen, setResumen] = useState({
     total_votos: 0,
     casillas_capturadas: 0,
@@ -33,8 +27,6 @@ function App() {
     avance_captura: 0,
     partidos: [],
   });
-  const [casillaSeleccionada, setCasillaSeleccionada] = useState(null);
-  const [votos, setVotos] = useState({});
   const [mensaje, setMensaje] = useState("");
   const [autenticado, setAutenticado] = useState(() => isAuthenticated());
   const [cargando, setCargando] = useState(() => isAuthenticated());
@@ -42,10 +34,34 @@ function App() {
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const [loginCargando, setLoginCargando] = useState(false);
 
-  useEffect(() => {
-    if (autenticado) {
-      cargarDatosIniciales();
+  async function cargarDatosIniciales() {
+    try {
+      const resumenData = await getResumen();
+      setResumen(resumenData);
+    } catch (error) {
+      setMensaje(error.message);
+      if (!isAuthenticated()) {
+        setAutenticado(false);
+      }
+    } finally {
+      setCargando(false);
     }
+  }
+
+  async function actualizarResumen() {
+    const resumenData = await getResumen();
+    setResumen(resumenData);
+    setUltimaActualizacion(new Date());
+  }
+
+  useEffect(() => {
+    if (!autenticado) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      cargarDatosIniciales();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [autenticado]);
 
   useEffect(() => {
@@ -82,97 +98,7 @@ function App() {
   function cerrarSesion() {
     logout();
     setAutenticado(false);
-    setCasillas([]);
-    setPartidos([]);
-    setCasillaSeleccionada(null);
-    setVotos({});
     setMensaje("");
-  }
-
-  async function cargarDatosIniciales() {
-    try {
-      const [casillasData, partidosData, resumenData] = await Promise.all([
-        getCasillas(),
-        getPartidos(),
-        getResumen(),
-      ]);
-
-      setCasillas(casillasData);
-      setPartidos(partidosData);
-      setResumen(resumenData);
-    } catch (error) {
-      setMensaje(error.message);
-      if (!isAuthenticated()) {
-        setAutenticado(false);
-      }
-    } finally {
-      setCargando(false);
-    }
-  }
-
-  async function actualizarResumen() {
-    const resumenData = await getResumen();
-    setResumen(resumenData);
-    setUltimaActualizacion(new Date());
-  }
-
-  async function seleccionarCasilla(casilla) {
-    setCasillaSeleccionada(casilla);
-    setMensaje("");
-
-    try {
-      const resultados = await getResultadosCasilla(casilla.id);
-      const votosActuales = {};
-
-      resultados.forEach((resultado) => {
-        votosActuales[resultado.partido.id] = resultado.votos;
-      });
-
-      partidos.forEach((partido) => {
-        if (votosActuales[partido.id] === undefined) {
-          votosActuales[partido.id] = 0;
-        }
-      });
-
-      setVotos(votosActuales);
-    } catch (error) {
-      setMensaje(error.message);
-      if (!isAuthenticated()) {
-        setAutenticado(false);
-      }
-    }
-  }
-
-  function cambiarVotos(partidoId, valor) {
-    setVotos({
-      ...votos,
-      [partidoId]: Number(valor),
-    });
-  }
-
-  async function guardarVotos(event) {
-    event.preventDefault();
-
-    if (!casillaSeleccionada) {
-      setMensaje("Selecciona una casilla primero.");
-      return;
-    }
-
-    try {
-      const resultados = partidos.map((partido) => ({
-        partido_id: partido.id,
-        votos: votos[partido.id] || 0,
-      }));
-
-      await guardarResultadosCasilla(casillaSeleccionada.id, resultados);
-      await actualizarResumen();
-      setMensaje("Resultados guardados correctamente.");
-    } catch (error) {
-      setMensaje(error.message);
-      if (!isAuthenticated()) {
-        setAutenticado(false);
-      }
-    }
   }
 
   const chartData = useMemo(
@@ -209,7 +135,7 @@ function App() {
     },
   };
 
-  const casillasRegistradas = resumen.casillas_registradas || casillas.length;
+  const casillasRegistradas = resumen.casillas_registradas || 0;
   const porcentajeCasillas = Math.min(100, resumen.avance_captura || 0);
 
   const totalFormateado = new Intl.NumberFormat("es-MX").format(
@@ -392,10 +318,18 @@ function App() {
                   return (
                     <tr key={partido.partido_id}>
                       <td>
-                        <span
-                          className="party-swatch"
-                          style={{ backgroundColor: partido.color }}
-                        ></span>
+                        {partido.imagen_url ? (
+                          <img
+                            className="party-thumbnail"
+                            src={partido.imagen_url}
+                            alt={`Logo de ${partido.siglas}`}
+                          />
+                        ) : (
+                          <span
+                            className="party-swatch"
+                            style={{ backgroundColor: partido.color }}
+                          ></span>
+                        )}
                         <strong>{partido.siglas}</strong>
                         <span className="party-name">{partido.nombre}</span>
                       </td>
@@ -413,90 +347,6 @@ function App() {
           </div>
         </div>
       </section>
-
-      <div className="capture-grid">
-        <section className="panel">
-          <div className="panel-header">
-            <div>
-              <p className="section-label">Seleccion</p>
-              <h2>Casillas</h2>
-            </div>
-          </div>
-            <div className="casilla-list list-group list-group-flush">
-              {casillas.map((casilla) => (
-                <button
-                  key={casilla.id}
-                  type="button"
-                  className={`casilla-button list-group-item list-group-item-action ${
-                    casillaSeleccionada?.id === casilla.id ? "active" : ""
-                  }`}
-                  onClick={() => seleccionarCasilla(casilla)}
-                >
-                  <strong>{casilla.seccion.municipio.nombre}</strong>
-                  <br />
-                  Seccion {casilla.seccion.numero} / {casilla.tipo_nombre}{" "}
-                  {casilla.numero}
-                </button>
-              ))}
-
-              {casillas.length === 0 && (
-                <div className="list-group-item text-muted">
-                  No hay casillas registradas.
-                </div>
-              )}
-            </div>
-        </section>
-
-        <section className="panel">
-          <div className="panel-header">
-            <div>
-              <p className="section-label">Captura</p>
-              <h2>Resultados de casilla</h2>
-            </div>
-          </div>
-
-            {!casillaSeleccionada ? (
-              <div className="empty-state text-muted">
-                Selecciona una casilla para capturar votos.
-              </div>
-            ) : (
-              <form onSubmit={guardarVotos}>
-                <div className="capture-body">
-                  <h2 className="capture-title h5">
-                    Seccion {casillaSeleccionada.seccion.numero} /{" "}
-                    {casillaSeleccionada.tipo_nombre}{" "}
-                    {casillaSeleccionada.numero}
-                  </h2>
-
-                  <div className="row g-3 mt-2">
-                    {partidos.map((partido) => (
-                      <div className="col-md-6" key={partido.id}>
-                        <label className="party-label form-label">
-                          {partido.siglas} - {partido.nombre}
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          className="form-control"
-                          value={votos[partido.id] ?? 0}
-                          onChange={(event) =>
-                            cambiarVotos(partido.id, event.target.value)
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="save-actions">
-                  <button type="submit" className="btn btn-primary">
-                    Guardar resultados
-                  </button>
-                </div>
-              </form>
-            )}
-        </section>
-      </div>
     </main>
   );
 }

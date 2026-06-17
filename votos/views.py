@@ -34,6 +34,7 @@ def api_resumen(request):
             "nombre": partido.nombre,
             "siglas": partido.siglas,
             "color": partido.color,
+            "imagen_url": partido.imagen_url,
             "total_votos": partido.total_votos or 0,
         }
         for partido in totales

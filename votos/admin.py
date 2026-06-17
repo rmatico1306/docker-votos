@@ -26,7 +26,7 @@ class CasillaAdmin(admin.ModelAdmin):
 
 @admin.register(Partido)
 class PartidoAdmin(admin.ModelAdmin):
-    list_display = ["siglas", "nombre", "color"]
+    list_display = ["siglas", "nombre", "color", "imagen_url"]
     search_fields = ["siglas", "nombre"]
 
 

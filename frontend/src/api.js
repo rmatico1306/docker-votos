@@ -64,22 +64,3 @@ export async function getResumen() {
   if (!response.ok) throw new Error("No se pudo cargar el resumen");
   return response.json();
 }
-
-export async function getResultadosCasilla(casillaId) {
-  const response = await requestJson(`${API_URL}/casillas/${casillaId}/resultados/`);
-  if (!response.ok) throw new Error("No se pudieron cargar los resultados");
-  return response.json();
-}
-
-export async function guardarResultadosCasilla(casillaId, resultados) {
-  const response = await requestJson(`${API_URL}/casillas/${casillaId}/resultados/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ resultados }),
-  });
-
-  if (!response.ok) throw new Error("No se pudieron guardar los resultados");
-  return response.json();
-}
