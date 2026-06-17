@@ -15,6 +15,9 @@ import {
   getPartidos,
   getResultadosCasilla,
   getResumen,
+  isAuthenticated,
+  login,
+  logout,
   guardarResultadosCasilla,
 } from "./api";
 
@@ -33,22 +36,58 @@ function App() {
   const [casillaSeleccionada, setCasillaSeleccionada] = useState(null);
   const [votos, setVotos] = useState({});
   const [mensaje, setMensaje] = useState("");
-  const [cargando, setCargando] = useState(true);
+  const [autenticado, setAutenticado] = useState(() => isAuthenticated());
+  const [cargando, setCargando] = useState(() => isAuthenticated());
   const [ultimaActualizacion, setUltimaActualizacion] = useState(new Date());
+  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
+  const [loginCargando, setLoginCargando] = useState(false);
 
   useEffect(() => {
-    cargarDatosIniciales();
-  }, []);
+    if (autenticado) {
+      cargarDatosIniciales();
+    }
+  }, [autenticado]);
 
   useEffect(() => {
+    if (!autenticado) return undefined;
+
     const intervalId = window.setInterval(() => {
       actualizarResumen().catch((error) => {
         setMensaje(error.message);
+        if (!isAuthenticated()) {
+          setAutenticado(false);
+        }
       });
     }, 5000);
 
     return () => window.clearInterval(intervalId);
-  }, []);
+  }, [autenticado]);
+
+  async function iniciarSesion(event) {
+    event.preventDefault();
+    setLoginCargando(true);
+    setMensaje("");
+
+    try {
+      await login(loginForm.username, loginForm.password);
+      setAutenticado(true);
+      setCargando(true);
+    } catch (error) {
+      setMensaje(error.message);
+    } finally {
+      setLoginCargando(false);
+    }
+  }
+
+  function cerrarSesion() {
+    logout();
+    setAutenticado(false);
+    setCasillas([]);
+    setPartidos([]);
+    setCasillaSeleccionada(null);
+    setVotos({});
+    setMensaje("");
+  }
 
   async function cargarDatosIniciales() {
     try {
@@ -63,6 +102,9 @@ function App() {
       setResumen(resumenData);
     } catch (error) {
       setMensaje(error.message);
+      if (!isAuthenticated()) {
+        setAutenticado(false);
+      }
     } finally {
       setCargando(false);
     }
@@ -95,6 +137,9 @@ function App() {
       setVotos(votosActuales);
     } catch (error) {
       setMensaje(error.message);
+      if (!isAuthenticated()) {
+        setAutenticado(false);
+      }
     }
   }
 
@@ -124,6 +169,9 @@ function App() {
       setMensaje("Resultados guardados correctamente.");
     } catch (error) {
       setMensaje(error.message);
+      if (!isAuthenticated()) {
+        setAutenticado(false);
+      }
     }
   }
 
@@ -181,6 +229,64 @@ function App() {
     );
   }
 
+  if (!autenticado) {
+    return (
+      <main className="login-page">
+        <section className="login-panel">
+          <div className="prep-logo login-logo">SM</div>
+          <p className="prep-kicker">Sistema interno municipal</p>
+          <h1>Iniciar sesion</h1>
+
+          {mensaje && <div className="alert alert-info">{mensaje}</div>}
+
+          <form onSubmit={iniciarSesion}>
+            <div className="mb-3">
+              <label className="form-label" htmlFor="username">
+                Usuario
+              </label>
+              <input
+                id="username"
+                type="text"
+                className="form-control"
+                value={loginForm.username}
+                onChange={(event) =>
+                  setLoginForm({ ...loginForm, username: event.target.value })
+                }
+                autoComplete="username"
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label" htmlFor="password">
+                Contrasena
+              </label>
+              <input
+                id="password"
+                type="password"
+                className="form-control"
+                value={loginForm.password}
+                onChange={(event) =>
+                  setLoginForm({ ...loginForm, password: event.target.value })
+                }
+                autoComplete="current-password"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loginCargando}
+            >
+              {loginCargando ? "Entrando..." : "Entrar"}
+            </button>
+          </form>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="prep-page">
       <header className="prep-topbar">
@@ -195,6 +301,9 @@ function App() {
           <span className="status-dot"></span>
           Actualizacion automatica
         </div>
+        <button type="button" className="btn btn-light" onClick={cerrarSesion}>
+          Cerrar sesion
+        </button>
       </header>
 
       {mensaje && <div className="alert alert-info">{mensaje}</div>}

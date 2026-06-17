@@ -3,7 +3,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [5 0 R 6 0 R] /Count 2 >>
+<< /Type /Pages /Kids [5 0 R 6 0 R 7 0 R] /Count 3 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
@@ -12,12 +12,15 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier >>
 endobj
 5 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
-endobj
-6 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
 endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
 7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+8 0 obj
 << /Length 2670 >>
 stream
 BT
@@ -142,8 +145,8 @@ ET
 
 endstream
 endobj
-8 0 obj
-<< /Length 1449 >>
+9 0 obj
+<< /Length 2828 >>
 stream
 BT
 /F1 10 Tf
@@ -212,23 +215,165 @@ BT
 /F2 10 Tf
 72 376 Td (git push origin main) Tj
 -72 -376 Td
+/F1 14 Tf
+54 350 Td (AWS EC2 - conexion SSH) Tj
+-54 -350 Td
+/F2 10 Tf
+72 328 Td (ssh -i .\\mvp-prueba-key.pem ubuntu@18.222.10.25) Tj
+-72 -328 Td
+/F1 10 Tf
+72 312 Td (Entra a la instancia Ubuntu EC2 usando la llave .pem.) Tj
+-72 -312 Td
+/F2 10 Tf
+72 296 Td (icacls .\\mvp-prueba-key.pem /inheritance:r) Tj
+-72 -296 Td
+/F1 10 Tf
+72 280 Td (Quita herencia de permisos en Windows para que SSH acepte la llave.) Tj
+-72 -280 Td
+/F2 10 Tf
+72 264 Td (icacls .\\mvp-prueba-key.pem /grant "victor.lopez:R") Tj
+-72 -264 Td
+/F1 10 Tf
+72 248 Td (Da permiso de lectura solo a tu usuario de Windows.) Tj
+-72 -248 Td
+/F1 14 Tf
+54 222 Td (AWS EC2 - instalar Docker) Tj
+-54 -222 Td
+/F2 10 Tf
+72 200 Td (sudo apt update) Tj
+-72 -200 Td
+/F1 10 Tf
+72 184 Td (Actualiza indices de paquetes en Ubuntu.) Tj
+-72 -184 Td
+/F2 10 Tf
+72 168 Td (sudo apt install -y ca-certificates curl git) Tj
+-72 -168 Td
+/F1 10 Tf
+72 152 Td (Instala herramientas base para descargar Docker y clonar repos.) Tj
+-72 -152 Td
+/F2 10 Tf
+72 136 Td (sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin) Tj
+-72 -136 Td
+/F1 10 Tf
+72 120 Td (Instala Docker Engine y el plugin de Docker Compose.) Tj
+-72 -120 Td
+/F2 10 Tf
+72 104 Td (sudo usermod -aG docker ubuntu) Tj
+-72 -104 Td
+/F1 10 Tf
+72 88 Td (Permite usar Docker sin sudo. Despues sal y vuelve a entrar por SSH.) Tj
+-72 -88 Td
+ET
+
+endstream
+endobj
+10 0 obj
+<< /Length 2168 >>
+stream
+BT
+/F1 14 Tf
+54 760 Td (AWS EC2 - desplegar proyecto) Tj
+-54 -760 Td
+/F2 10 Tf
+72 738 Td (git clone https://github.com/rmatico1306/docker-votos.git) Tj
+-72 -738 Td
+/F1 10 Tf
+72 722 Td (Clona el repositorio en la EC2.) Tj
+-72 -722 Td
+/F2 10 Tf
+72 706 Td (cd docker-votos) Tj
+-72 -706 Td
+/F1 10 Tf
+72 690 Td (Entra a la carpeta del proyecto.) Tj
+-72 -690 Td
+/F2 10 Tf
+72 674 Td (docker compose up -d --build) Tj
+-72 -674 Td
+/F1 10 Tf
+72 658 Td (Construye y levanta la app en segundo plano.) Tj
+-72 -658 Td
+/F2 10 Tf
+72 642 Td (docker compose exec web python manage.py migrate) Tj
+-72 -642 Td
+/F1 10 Tf
+72 626 Td (Aplica migraciones antes de crear usuario admin.) Tj
+-72 -626 Td
+/F2 10 Tf
+72 610 Td (docker compose exec web python manage.py createsuperuser) Tj
+-72 -610 Td
+/F1 10 Tf
+72 594 Td (Crea usuario y contrasena para el admin de Django.) Tj
+-72 -594 Td
+/F1 14 Tf
+54 568 Td (AWS EC2 - actualizar servidor) Tj
+-54 -568 Td
+/F2 10 Tf
+72 546 Td (cd docker-votos) Tj
+-72 -546 Td
+/F2 10 Tf
+72 530 Td (git pull origin main) Tj
+-72 -530 Td
+/F2 10 Tf
+72 514 Td (docker compose up -d --build) Tj
+-72 -514 Td
+/F2 10 Tf
+72 498 Td (docker compose exec web python manage.py migrate) Tj
+-72 -498 Td
+/F1 10 Tf
+72 482 Td (Usa este flujo despues de subir cambios desde tu local a GitHub.) Tj
+-72 -482 Td
+/F1 14 Tf
+54 456 Td (Variables .env usadas en EC2) Tj
+-54 -456 Td
+/F2 10 Tf
+72 434 Td (nano .env) Tj
+-72 -434 Td
+/F1 10 Tf
+72 418 Td (Abre el archivo de variables de entorno en la EC2.) Tj
+-72 -418 Td
+/F2 10 Tf
+72 402 Td (VITE_API_URL=http://18.222.10.25:8000/api) Tj
+-72 -402 Td
+/F1 10 Tf
+72 386 Td (Hace que React llame al API de Django en la EC2.) Tj
+-72 -386 Td
+/F2 10 Tf
+72 370 Td (CORS_ALLOWED_ORIGINS=http://18.222.10.25:5173,http://localhost:5173,http://localhost:3000) Tj
+-72 -370 Td
+/F1 10 Tf
+72 354 Td (Permite que Django acepte llamadas desde el frontend.) Tj
+-72 -354 Td
+/F1 14 Tf
+54 328 Td (Direcciones en EC2) Tj
+-54 -328 Td
+/F2 10 Tf
+72 306 Td (React/Vite: http://18.222.10.25:5173) Tj
+-72 -306 Td
+/F2 10 Tf
+72 290 Td (Django admin: http://18.222.10.25:8000/admin/) Tj
+-72 -290 Td
+/F2 10 Tf
+72 274 Td (Django API: http://18.222.10.25:8000/api) Tj
+-72 -274 Td
 ET
 
 endstream
 endobj
 xref
-0 9
+0 11
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000121 00000 n 
-0000000191 00000 n 
-0000000259 00000 n 
-0000000395 00000 n 
-0000000531 00000 n 
-0000003253 00000 n 
+0000000127 00000 n 
+0000000197 00000 n 
+0000000265 00000 n 
+0000000401 00000 n 
+0000000537 00000 n 
+0000000674 00000 n 
+0000003396 00000 n 
+0000006276 00000 n 
 trailer
-<< /Size 9 /Root 1 0 R >>
+<< /Size 11 /Root 1 0 R >>
 startxref
-4754
+8497
 %%EOF
