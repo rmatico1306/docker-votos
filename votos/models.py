@@ -65,8 +65,24 @@ class Casilla(models.Model):
 
 
 class Partido(models.Model):
+    TIPO_PARTIDO = "PARTIDO"
+    TIPO_NULO = "NULO"
+    TIPO_NO_REGISTRADO = "NO_REGISTRADO"
+
+    TIPOS_PARTIDO = [
+        (TIPO_PARTIDO, "Partido"),
+        (TIPO_NULO, "Voto Nulo"),
+        (TIPO_NO_REGISTRADO, "No Registrado"),
+    ]
+
     nombre = models.CharField(max_length=120, unique=True)
     siglas = models.CharField(max_length=20, unique=True)
+    tipo = models.CharField(
+        max_length=30,
+        choices=TIPOS_PARTIDO,
+        default=TIPO_PARTIDO,
+    )
+    orden_captura = models.PositiveIntegerField(default=0)
     color = models.CharField(max_length=20, default="#6c757d")
     imagen_url = models.URLField(
         "URL de imagen",
@@ -75,7 +91,7 @@ class Partido(models.Model):
     )
 
     class Meta:
-        ordering = ["siglas"]
+        ordering = ["orden_captura", "siglas"]
         verbose_name = "Partido"
         verbose_name_plural = "Partidos"
 

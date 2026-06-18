@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Inicio</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:votos_casilla_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; Importar Excel
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <fieldset class="module aligned">
+        <div class="form-row">
+          {{ form.municipio.errors }}
+          {{ form.municipio.label_tag }}
+          {{ form.municipio }}
+          {% if form.municipio.help_text %}
+            <div class="help">{{ form.municipio.help_text }}</div>
+          {% endif %}
+        </div>
+        <div class="form-row">
+          {{ form.archivo.errors }}
+          {{ form.archivo.label_tag }}
+          {{ form.archivo }}
+          {% if form.archivo.help_text %}
+            <div class="help">{{ form.archivo.help_text }}</div>
+          {% endif %}
+        </div>
+      </fieldset>
+
+      <div class="submit-row">
+        <input type="submit" value="Importar casillas" class="default">
+        <a href="{% url 'admin:votos_casilla_changelist' %}" class="closelink">Cancelar</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

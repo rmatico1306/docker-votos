@@ -27,9 +27,20 @@ class CasillaSerializer(serializers.ModelSerializer):
 
 
 class PartidoSerializer(serializers.ModelSerializer):
+    tipo_nombre = serializers.CharField(source="get_tipo_display", read_only=True)
+
     class Meta:
         model = Partido
-        fields = ["id", "nombre", "siglas", "color", "imagen_url"]
+        fields = [
+            "id",
+            "nombre",
+            "siglas",
+            "tipo",
+            "tipo_nombre",
+            "orden_captura",
+            "color",
+            "imagen_url",
+        ]
 
 
 class ResultadoCasillaSerializer(serializers.ModelSerializer):

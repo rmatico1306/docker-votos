@@ -48,6 +48,12 @@ export function isAuthenticated() {
   return Boolean(window.localStorage.getItem("authToken"));
 }
 
+export async function getUsuarioActual() {
+  const response = await requestJson(`${API_URL}/auth/me/`);
+  if (!response.ok) throw new Error("No se pudo cargar el usuario actual");
+  return response.json();
+}
+
 export async function getCasillas() {
   const response = await requestJson(`${API_URL}/casillas/`);
   if (!response.ok) throw new Error("No se pudieron cargar las casillas");
@@ -60,8 +66,33 @@ export async function getPartidos() {
   return response.json();
 }
 
+export async function getCapturaSecciones() {
+  const response = await requestJson(`${API_URL}/captura/secciones/`);
+  if (!response.ok) throw new Error("No se pudieron cargar las secciones");
+  return response.json();
+}
+
 export async function getResumen() {
   const response = await requestJson(`${API_URL}/resumen/`);
   if (!response.ok) throw new Error("No se pudo cargar el resumen");
+  return response.json();
+}
+
+export async function getResultadosCasilla(casillaId) {
+  const response = await requestJson(`${API_URL}/casillas/${casillaId}/resultados/`);
+  if (!response.ok) throw new Error("No se pudieron cargar los resultados");
+  return response.json();
+}
+
+export async function guardarResultadosCasilla(casillaId, resultados) {
+  const response = await requestJson(`${API_URL}/casillas/${casillaId}/resultados/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ resultados }),
+  });
+
+  if (!response.ok) throw new Error("No se pudieron guardar los resultados");
   return response.json();
 }
