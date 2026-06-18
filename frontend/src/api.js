@@ -9,6 +9,7 @@ function getAuthHeaders() {
 async function requestJson(url, options = {}) {
   const response = await fetch(url, {
     ...options,
+    cache: "no-store",
     headers: {
       ...getAuthHeaders(),
       ...options.headers,

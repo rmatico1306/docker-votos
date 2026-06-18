@@ -19,6 +19,8 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
+const TIEMPO_REFRESCO_MS = 30000;
+
 function App() {
   const [resumen, setResumen] = useState({
     total_votos: 0,
@@ -38,6 +40,7 @@ function App() {
     try {
       const resumenData = await getResumen();
       setResumen(resumenData);
+      setUltimaActualizacion(new Date());
     } catch (error) {
       setMensaje(error.message);
       if (!isAuthenticated()) {
@@ -74,7 +77,7 @@ function App() {
           setAutenticado(false);
         }
       });
-    }, 5000);
+    }, TIEMPO_REFRESCO_MS);
 
     return () => window.clearInterval(intervalId);
   }, [autenticado]);
@@ -146,6 +149,7 @@ function App() {
     dateStyle: "medium",
     timeStyle: "medium",
   }).format(ultimaActualizacion);
+  const segundosRefresco = TIEMPO_REFRESCO_MS / 1000;
 
   if (cargando) {
     return (
@@ -246,7 +250,7 @@ function App() {
         <div className="cutoff-panel">
           <span>Ultimo corte</span>
           <strong>{fechaCorte}</strong>
-          <small>Refresco cada 5 segundos</small>
+          <small>Refresco cada {segundosRefresco} segundos</small>
         </div>
       </section>
 
