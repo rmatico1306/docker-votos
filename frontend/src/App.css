@@ -423,6 +423,10 @@
   text-align: center;
 }
 
+.mobile-search-hint {
+  display: none;
+}
+
 .section-option,
 .booth-button {
   display: flex;
@@ -871,6 +875,38 @@
     max-height: 340px;
     border-right: 0;
     border-bottom: 1px solid #d9dee6;
+  }
+
+  .mobile-empty-search .section-option,
+  .section-option.hide-mobile-section {
+    display: none;
+  }
+
+  .mobile-empty-search .booth-workspace {
+    display: none;
+  }
+
+  .booth-summary {
+    display: none;
+  }
+
+  .mobile-empty-search .mobile-search-hint {
+    display: grid;
+    gap: 4px;
+    padding: 16px;
+    color: #1e40af;
+    background: #eff6ff;
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+  }
+
+  .mobile-search-hint strong {
+    color: #111827;
+  }
+
+  .mobile-search-hint span {
+    color: #64748b;
+    font-size: 0.9rem;
   }
 }
 

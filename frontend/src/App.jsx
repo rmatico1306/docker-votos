@@ -45,6 +45,7 @@ function App() {
   const [guardandoCaptura, setGuardandoCaptura] = useState(false);
   const [moduloActivo, setModuloActivo] = useState("");
   const [busquedaSeccion, setBusquedaSeccion] = useState("");
+  const [seccionMovilEnFoco, setSeccionMovilEnFoco] = useState(false);
   const [busquedaPartido, setBusquedaPartido] = useState("");
   const [usuarioMenuAbierto, setUsuarioMenuAbierto] = useState(false);
   const [autenticado, setAutenticado] = useState(() => isAuthenticated());
@@ -330,6 +331,7 @@ function App() {
 
     setSeccionActivaId(primeraSeccion.id);
     setCasillaActiva(null);
+    setSeccionMovilEnFoco(true);
   }
 
   if (cargando) {
@@ -554,7 +556,11 @@ function App() {
             </button>
           </div>
 
-          <div className="capture-layout">
+          <div
+            className={`capture-layout ${
+              !busquedaSeccion.trim() ? "mobile-empty-search" : ""
+            }`}
+          >
             <aside className="section-list">
               <form className="section-search" onSubmit={buscarSeccionRapida}>
                 <input
@@ -562,7 +568,10 @@ function App() {
                   className="form-control"
                   placeholder="Buscar seccion"
                   value={busquedaSeccion}
-                  onChange={(event) => setBusquedaSeccion(event.target.value)}
+                  onChange={(event) => {
+                    setBusquedaSeccion(event.target.value);
+                    setSeccionMovilEnFoco(false);
+                  }}
                 />
                 <button type="submit" className="btn btn-primary btn-sm">
                   Buscar
@@ -570,6 +579,10 @@ function App() {
               </form>
 
               <div className="section-scroll">
+                <div className="mobile-search-hint">
+                  <strong>Busca una seccion</strong>
+                  <span>Escribe el numero de seccion para ver sus casillas.</span>
+                </div>
                 {seccionesFiltradas.length === 0 ? (
                   <div className="section-empty">Sin coincidencias</div>
                 ) : (
@@ -579,10 +592,24 @@ function App() {
                       type="button"
                       className={`section-option ${
                         seccion.id === seccionActivaId ? "active" : ""
+                      } ${
+                        seccionActivaId &&
+                        (!busquedaSeccion.trim() || seccionMovilEnFoco) &&
+                        seccion.id !== seccionActivaId
+                          ? "hide-mobile-section"
+                          : ""
                       }`}
                       onClick={() => {
-                        setSeccionActivaId(seccion.id);
-                        setCasillaActiva(null);
+                        if (
+                          seccion.id === seccionActivaId &&
+                          seccionMovilEnFoco
+                        ) {
+                          setSeccionMovilEnFoco(false);
+                        } else {
+                          setSeccionActivaId(seccion.id);
+                          setCasillaActiva(null);
+                          setSeccionMovilEnFoco(true);
+                        }
                       }}
                     >
                       <span>
