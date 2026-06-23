@@ -3,9 +3,10 @@ import unicodedata
 from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import path
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 
 # Register your models here.
 from .models import Casilla, Municipio, Partido, ResultadoCasilla, Seccion
@@ -81,6 +82,61 @@ def normalizar_tipo_casilla(valor):
         "especial": Casilla.TIPO_ESPECIAL,
     }
     return tipos.get(texto)
+
+
+def crear_excel_resultados(queryset):
+    libro = Workbook()
+    hoja = libro.active
+    hoja.title = "Resultados"
+    hoja.append(
+        [
+            "Municipio",
+            "Seccion",
+            "Tipo casilla",
+            "Numero casilla",
+            "Partido",
+            "Nombre partido",
+            "Tipo partido",
+            "Votos",
+        ]
+    )
+
+    for resultado in queryset.select_related(
+        "casilla",
+        "casilla__seccion",
+        "casilla__seccion__municipio",
+        "partido",
+    ):
+        casilla = resultado.casilla
+        seccion = casilla.seccion
+        partido = resultado.partido
+        hoja.append(
+            [
+                seccion.municipio.nombre,
+                seccion.numero,
+                casilla.get_tipo_display(),
+                casilla.numero,
+                partido.siglas,
+                partido.nombre,
+                partido.get_tipo_display(),
+                resultado.votos,
+            ]
+        )
+
+    for columna in hoja.columns:
+        ancho = max(len(str(celda.value or "")) for celda in columna)
+        hoja.column_dimensions[columna[0].column_letter].width = min(ancho + 2, 40)
+
+    response = HttpResponse(
+        content_type=(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ),
+    )
+    response["Content-Disposition"] = (
+        'attachment; filename="resultados-casilla.xlsx"'
+    )
+    libro.save(response)
+    return response
 
 
 @admin.register(Municipio)
@@ -330,6 +386,7 @@ class PartidoAdmin(admin.ModelAdmin):
 
 @admin.register(ResultadoCasilla)
 class ResultadoCasillaAdmin(admin.ModelAdmin):
+    change_list_template = "admin/votos/resultadocasilla/change_list.html"
     list_display = ["casilla", "partido", "votos"]
     list_filter = ["partido", "casilla__seccion__municipio"]
     search_fields = [
@@ -338,3 +395,30 @@ class ResultadoCasillaAdmin(admin.ModelAdmin):
         "casilla__seccion__numero",
         "casilla__seccion__municipio__nombre",
     ]
+    actions = ["exportar_seleccionados_excel"]
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "exportar-excel/",
+                self.admin_site.admin_view(self.exportar_excel),
+                name="votos_resultadocasilla_exportar_excel",
+            ),
+        ]
+        return custom_urls + urls
+
+    def exportar_excel(self, request):
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+
+        changelist = self.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        return crear_excel_resultados(queryset)
+
+    @admin.action(description="Exportar seleccionados a Excel")
+    def exportar_seleccionados_excel(self, request, queryset):
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+
+        return crear_excel_resultados(queryset)

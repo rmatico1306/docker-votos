@@ -55,7 +55,9 @@ function App() {
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const [loginCargando, setLoginCargando] = useState(false);
   const [socketConectado, setSocketConectado] = useState(false);
+  const [socketReconnectIntento, setSocketReconnectIntento] = useState(0);
   const resumenSocketTimeoutRef = useRef(null);
+  const socketReconnectTimeoutRef = useRef(null);
 
   async function cargarDatosIniciales() {
     try {
@@ -198,6 +200,7 @@ function App() {
       return undefined;
     }
 
+    let debeReconectar = true;
     const socket = new WebSocket(getResultadosSocketUrl());
 
     socket.addEventListener("open", () => {
@@ -228,6 +231,19 @@ function App() {
 
     socket.addEventListener("close", () => {
       setSocketConectado(false);
+      actualizarResumen().catch((error) => {
+        setMensaje(error.message);
+        if (!isAuthenticated()) {
+          setAutenticado(false);
+        }
+      });
+
+      if (debeReconectar) {
+        window.clearTimeout(socketReconnectTimeoutRef.current);
+        socketReconnectTimeoutRef.current = window.setTimeout(() => {
+          setSocketReconnectIntento((intento) => intento + 1);
+        }, 3000);
+      }
     });
 
     socket.addEventListener("error", () => {
@@ -235,11 +251,13 @@ function App() {
     });
 
     return () => {
+      debeReconectar = false;
       window.clearTimeout(resumenSocketTimeoutRef.current);
+      window.clearTimeout(socketReconnectTimeoutRef.current);
       socket.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autenticado, usuario]);
+  }, [autenticado, usuario, socketReconnectIntento]);
 
   async function iniciarSesion(event) {
     event.preventDefault();

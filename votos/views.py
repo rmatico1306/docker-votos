@@ -1,4 +1,5 @@
 from rest_framework import status
+from django.db import transaction
 from django.db.models import Sum
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -171,16 +172,17 @@ def api_resultados_casilla(request, casilla_id):
 
     resultados = request.data.get("resultados", [])
 
-    for item in resultados:
-        partido_id = item.get("partido_id")
-        votos = item.get("votos", 0)
+    with transaction.atomic():
+        for item in resultados:
+            partido_id = item.get("partido_id")
+            votos = item.get("votos", 0)
 
-        partido = Partido.objects.get(id=partido_id)
+            partido = Partido.objects.get(id=partido_id)
 
-        ResultadoCasilla.objects.update_or_create(
-            casilla=casilla,
-            partido=partido,
-            defaults={"votos": votos},
-        )
+            ResultadoCasilla.objects.update_or_create(
+                casilla=casilla,
+                partido=partido,
+                defaults={"votos": votos},
+            )
 
     return Response({"detail": "Resultados guardados correctamente."})
