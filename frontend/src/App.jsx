@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   BarElement,
@@ -15,6 +15,7 @@ import {
   getPartidos,
   getResumen,
   getResultadosCasilla,
+  getResultadosSocketUrl,
   getUsuarioActual,
   guardarResultadosCasilla,
   isAuthenticated,
@@ -53,6 +54,8 @@ function App() {
   const [ultimaActualizacion, setUltimaActualizacion] = useState(new Date());
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const [loginCargando, setLoginCargando] = useState(false);
+  const [socketConectado, setSocketConectado] = useState(false);
+  const resumenSocketTimeoutRef = useRef(null);
 
   async function cargarDatosIniciales() {
     try {
@@ -169,7 +172,11 @@ function App() {
   }, [autenticado]);
 
   useEffect(() => {
-    if (!autenticado || !usuario?.permisos?.puede_ver_resultados) {
+    if (
+      !autenticado ||
+      !usuario?.permisos?.puede_ver_resultados ||
+      socketConectado
+    ) {
       return undefined;
     }
 
@@ -183,6 +190,55 @@ function App() {
     }, TIEMPO_REFRESCO_MS);
 
     return () => window.clearInterval(intervalId);
+  }, [autenticado, usuario, socketConectado]);
+
+  useEffect(() => {
+    if (!autenticado || !usuario?.permisos?.puede_ver_resultados) {
+      setSocketConectado(false);
+      return undefined;
+    }
+
+    const socket = new WebSocket(getResultadosSocketUrl());
+
+    socket.addEventListener("open", () => {
+      setSocketConectado(true);
+    });
+
+    socket.addEventListener("message", (event) => {
+      let data;
+
+      try {
+        data = JSON.parse(event.data);
+      } catch {
+        return;
+      }
+
+      if (data.type === "resultados_actualizados") {
+        window.clearTimeout(resumenSocketTimeoutRef.current);
+        resumenSocketTimeoutRef.current = window.setTimeout(() => {
+          actualizarResumen().catch((error) => {
+            setMensaje(error.message);
+            if (!isAuthenticated()) {
+              setAutenticado(false);
+            }
+          });
+        }, 250);
+      }
+    });
+
+    socket.addEventListener("close", () => {
+      setSocketConectado(false);
+    });
+
+    socket.addEventListener("error", () => {
+      setSocketConectado(false);
+    });
+
+    return () => {
+      window.clearTimeout(resumenSocketTimeoutRef.current);
+      socket.close();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autenticado, usuario]);
 
   async function iniciarSesion(event) {
@@ -210,6 +266,7 @@ function App() {
     setCasillaActiva(null);
     setModuloActivo("");
     setUsuarioMenuAbierto(false);
+    setSocketConectado(false);
   }
 
   const partidosGrafica = useMemo(() => {
@@ -443,7 +500,7 @@ function App() {
           {moduloActivo === "resultados" && (
             <div className="prep-status">
               <span className="status-dot"></span>
-              Actualizacion automatica
+              {socketConectado ? "Actualizacion en vivo" : "Actualizacion automatica"}
             </div>
           )}
           {usuario?.username && (
@@ -496,7 +553,7 @@ function App() {
               <div className="cutoff-panel">
                 <span>Ultimo corte</span>
                 <strong>{fechaCorte}</strong>
-                <small>Refresco cada {segundosRefresco} segundos</small>
+                
               </div>
             </section>
 

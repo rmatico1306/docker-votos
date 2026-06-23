@@ -1,9 +1,24 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+const WS_URL = import.meta.env.VITE_WS_URL || getDefaultWebSocketUrl();
 
 function getAuthHeaders() {
   const token = window.localStorage.getItem("authToken");
 
   return token ? { Authorization: `Token ${token}` } : {};
+}
+
+function getAuthToken() {
+  return window.localStorage.getItem("authToken");
+}
+
+function getDefaultWebSocketUrl() {
+  const apiUrl = new URL(API_URL, window.location.origin);
+  apiUrl.protocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
+  apiUrl.pathname = apiUrl.pathname.replace(/\/api\/?$/, "/ws/resultados/");
+  apiUrl.search = "";
+  apiUrl.hash = "";
+
+  return apiUrl.toString();
 }
 
 async function requestJson(url, options = {}) {
@@ -46,6 +61,17 @@ export function logout() {
 
 export function isAuthenticated() {
   return Boolean(window.localStorage.getItem("authToken"));
+}
+
+export function getResultadosSocketUrl() {
+  const token = getAuthToken();
+  const url = new URL(WS_URL, window.location.origin);
+
+  if (token) {
+    url.searchParams.set("token", token);
+  }
+
+  return url.toString();
 }
 
 export async function getUsuarioActual() {
