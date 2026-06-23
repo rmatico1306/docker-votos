@@ -98,6 +98,12 @@ def crear_excel_resultados(queryset):
             "Nombre partido",
             "Tipo partido",
             "Votos",
+            "Total acta",
+            "Total calculado",
+            "Diferencia",
+            "Tiene diferencia",
+            "Usuario captura",
+            "Fecha captura",
         ]
     )
 
@@ -105,6 +111,7 @@ def crear_excel_resultados(queryset):
         "casilla",
         "casilla__seccion",
         "casilla__seccion__municipio",
+        "casilla__usuario_captura",
         "partido",
     ):
         casilla = resultado.casilla
@@ -120,6 +127,12 @@ def crear_excel_resultados(queryset):
                 partido.nombre,
                 partido.get_tipo_display(),
                 resultado.votos,
+                casilla.total_acta,
+                casilla.total_calculado,
+                casilla.diferencia,
+                "Si" if casilla.tiene_diferencia else "No",
+                casilla.usuario_captura.username if casilla.usuario_captura else "",
+                casilla.fecha_captura,
             ]
         )
 
@@ -252,9 +265,26 @@ class SeccionAdmin(admin.ModelAdmin):
 @admin.register(Casilla)
 class CasillaAdmin(admin.ModelAdmin):
     change_list_template = "admin/votos/casilla/change_list.html"
-    list_display = ["seccion", "tipo", "numero"]
-    list_filter = ["tipo", "seccion__municipio"]
+    list_display = [
+        "seccion",
+        "tipo",
+        "numero",
+        "total_acta",
+        "total_calculado",
+        "diferencia",
+        "tiene_diferencia",
+        "usuario_captura",
+        "fecha_captura",
+    ]
+    list_filter = ["tipo", "seccion__municipio", "tiene_diferencia"]
     search_fields = ["seccion__numero", "seccion__municipio__nombre"]
+    readonly_fields = [
+        "total_calculado",
+        "diferencia",
+        "tiene_diferencia",
+        "usuario_captura",
+        "fecha_captura",
+    ]
 
     def get_urls(self):
         urls = super().get_urls()
@@ -387,8 +417,18 @@ class PartidoAdmin(admin.ModelAdmin):
 @admin.register(ResultadoCasilla)
 class ResultadoCasillaAdmin(admin.ModelAdmin):
     change_list_template = "admin/votos/resultadocasilla/change_list.html"
-    list_display = ["casilla", "partido", "votos"]
-    list_filter = ["partido", "casilla__seccion__municipio"]
+    list_display = [
+        "casilla",
+        "partido",
+        "votos",
+        "total_acta",
+        "total_calculado",
+        "diferencia",
+        "tiene_diferencia",
+        "usuario_captura",
+        "fecha_captura",
+    ]
+    list_filter = ["partido", "casilla__seccion__municipio", "casilla__tiene_diferencia"]
     search_fields = [
         "partido__siglas",
         "partido__nombre",
@@ -396,6 +436,30 @@ class ResultadoCasillaAdmin(admin.ModelAdmin):
         "casilla__seccion__municipio__nombre",
     ]
     actions = ["exportar_seleccionados_excel"]
+
+    @admin.display(description="Total acta")
+    def total_acta(self, obj):
+        return obj.casilla.total_acta
+
+    @admin.display(description="Total calculado")
+    def total_calculado(self, obj):
+        return obj.casilla.total_calculado
+
+    @admin.display(description="Diferencia")
+    def diferencia(self, obj):
+        return obj.casilla.diferencia
+
+    @admin.display(boolean=True, description="Tiene diferencia")
+    def tiene_diferencia(self, obj):
+        return obj.casilla.tiene_diferencia
+
+    @admin.display(description="Usuario captura")
+    def usuario_captura(self, obj):
+        return obj.casilla.usuario_captura
+
+    @admin.display(description="Fecha captura")
+    def fecha_captura(self, obj):
+        return obj.casilla.fecha_captura
 
     def get_urls(self):
         urls = super().get_urls()

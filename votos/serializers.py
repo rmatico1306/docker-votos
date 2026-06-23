@@ -20,10 +20,27 @@ class SeccionSerializer(serializers.ModelSerializer):
 class CasillaSerializer(serializers.ModelSerializer):
     seccion = SeccionSerializer(read_only=True)
     tipo_nombre = serializers.CharField(source="get_tipo_display", read_only=True)
+    usuario_captura_username = serializers.CharField(
+        source="usuario_captura.username",
+        read_only=True,
+    )
 
     class Meta:
         model = Casilla
-        fields = ["id", "seccion", "tipo", "tipo_nombre", "numero"]
+        fields = [
+            "id",
+            "seccion",
+            "tipo",
+            "tipo_nombre",
+            "numero",
+            "total_acta",
+            "total_calculado",
+            "diferencia",
+            "tiene_diferencia",
+            "usuario_captura",
+            "usuario_captura_username",
+            "fecha_captura",
+        ]
 
 
 class PartidoSerializer(serializers.ModelSerializer):

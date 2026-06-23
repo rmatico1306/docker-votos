@@ -110,13 +110,13 @@ export async function getResultadosCasilla(casillaId) {
   return response.json();
 }
 
-export async function guardarResultadosCasilla(casillaId, resultados) {
+export async function guardarResultadosCasilla(casillaId, resultados, totalActa) {
   const response = await requestJson(`${API_URL}/casillas/${casillaId}/resultados/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ resultados }),
+    body: JSON.stringify({ resultados, total_acta: totalActa }),
   });
 
   if (!response.ok) throw new Error("No se pudieron guardar los resultados");

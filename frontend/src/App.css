@@ -568,6 +568,48 @@
   background: #d1fae5;
 }
 
+.capture-badge.difference {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.capture-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.capture-totals label,
+.capture-totals div {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid #d9dee6;
+  border-radius: 8px;
+}
+
+.capture-totals span {
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.capture-totals strong {
+  color: #111827;
+  font-size: 1.2rem;
+}
+
+.capture-warning {
+  padding: 12px;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
 .vote-inputs {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -962,6 +1004,7 @@
   }
 
   .booth-summary,
+  .capture-totals,
   .vote-inputs {
     grid-template-columns: 1fr;
   }

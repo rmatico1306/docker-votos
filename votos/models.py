@@ -1,5 +1,6 @@
 
 # Create your models here.
+from django.conf import settings
 from django.db import models
 
 
@@ -53,6 +54,18 @@ class Casilla(models.Model):
     )
     tipo = models.CharField(max_length=1, choices=TIPOS_CASILLA)
     numero = models.PositiveIntegerField(default=1)
+    total_acta = models.PositiveIntegerField(default=0)
+    total_calculado = models.PositiveIntegerField(default=0)
+    diferencia = models.IntegerField(default=0)
+    tiene_diferencia = models.BooleanField(default=False)
+    usuario_captura = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="casillas_capturadas",
+    )
+    fecha_captura = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ["seccion__numero", "tipo", "numero"]

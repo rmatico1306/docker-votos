@@ -42,6 +42,7 @@ function App() {
   const [seccionActivaId, setSeccionActivaId] = useState(null);
   const [casillaActiva, setCasillaActiva] = useState(null);
   const [votosForm, setVotosForm] = useState({});
+  const [totalActaForm, setTotalActaForm] = useState("");
   const [cargandoCaptura, setCargandoCaptura] = useState(false);
   const [guardandoCaptura, setGuardandoCaptura] = useState(false);
   const [moduloActivo, setModuloActivo] = useState("");
@@ -118,9 +119,12 @@ function App() {
 
   async function seleccionarCasilla(casilla) {
     setCasillaActiva(casilla);
+    setTotalActaForm(String(casilla.total_acta || ""));
     setMensaje("");
 
-    const resultados = await getResultadosCasilla(casilla.id);
+    const data = await getResultadosCasilla(casilla.id);
+    const resultados = Array.isArray(data) ? data : data.resultados || [];
+    const captura = Array.isArray(data) ? casilla : data.captura || casilla;
     const votosPorPartido = Object.fromEntries(
       partidos.map((partido) => [partido.id, "0"]),
     );
@@ -130,6 +134,8 @@ function App() {
     });
 
     setVotosForm(votosPorPartido);
+    setTotalActaForm(String(captura.total_acta || ""));
+    setCasillaActiva({ ...casilla, ...captura });
   }
 
   async function guardarCaptura(event) {
@@ -146,9 +152,21 @@ function App() {
         votos: Number(votosForm[partido.id] || 0),
       }));
 
-      await guardarResultadosCasilla(casillaActiva.id, resultados);
-      setMensaje("Resultados guardados correctamente.");
-      setCasillaActiva({ ...casillaActiva, capturada: true });
+      const capturaGuardada = await guardarResultadosCasilla(
+        casillaActiva.id,
+        resultados,
+        Number(totalActaForm || 0),
+      );
+      setMensaje(
+        capturaGuardada.tiene_diferencia
+          ? "Resultados guardados con diferencia."
+          : "Resultados guardados correctamente.",
+      );
+      setCasillaActiva({
+        ...casillaActiva,
+        ...capturaGuardada,
+        capturada: true,
+      });
       await Promise.all([
         usuario?.permisos?.puede_ver_resultados
           ? actualizarResumen()
@@ -393,6 +411,15 @@ function App() {
       );
     });
   }, [busquedaPartido, partidosTabla]);
+  const totalCalculadoCaptura = useMemo(() => {
+    return partidos.reduce(
+      (total, partido) => total + Number(votosForm[partido.id] || 0),
+      0,
+    );
+  }, [partidos, votosForm]);
+  const totalActaCaptura = Number(totalActaForm || 0);
+  const diferenciaCaptura = totalActaCaptura - totalCalculadoCaptura;
+  const tieneDiferenciaCaptura = diferenciaCaptura !== 0;
   const seccionActiva = capturaSecciones.find(
     (seccion) => seccion.id === seccionActivaId,
   );
@@ -749,12 +776,57 @@ function App() {
                         </div>
                         <span
                           className={`capture-badge ${
-                            casillaActiva.capturada ? "captured" : "pending"
+                            casillaActiva.tiene_diferencia
+                              ? "difference"
+                              : casillaActiva.capturada
+                                ? "captured"
+                                : "pending"
                           }`}
                         >
-                          {casillaActiva.capturada ? "Capturada" : "Pendiente"}
+                          {casillaActiva.capturada
+                            ? casillaActiva.tiene_diferencia
+                              ? "Guardado con diferencia"
+                              : "Cuadra"
+                            : "Pendiente"}
                         </span>
                       </div>
+
+                      <div className="capture-totals">
+                        <label>
+                          <span>Total del acta</span>
+                          <input
+                            type="number"
+                            className="form-control"
+                            min="1"
+                            required
+                            disabled={casillaActiva.capturada}
+                            value={totalActaForm}
+                            onChange={(event) =>
+                              setTotalActaForm(event.target.value)
+                            }
+                          />
+                        </label>
+                        <div>
+                          <span>Total calculado</span>
+                          <strong>{totalCalculadoCaptura}</strong>
+                        </div>
+                        <div>
+                          <span>Diferencia</span>
+                          <strong
+                            className={
+                              tieneDiferenciaCaptura ? "text-danger" : ""
+                            }
+                          >
+                            {diferenciaCaptura}
+                          </strong>
+                        </div>
+                      </div>
+
+                      {tieneDiferenciaCaptura && !casillaActiva.capturada && (
+                        <div className="capture-warning">
+                          La captura se guardara con diferencia para revision.
+                        </div>
+                      )}
 
                       <div className="vote-inputs">
                         {partidos.map((partido) => (
